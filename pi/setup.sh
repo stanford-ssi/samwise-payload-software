@@ -11,8 +11,10 @@ raspi-config nonint do_spi 0
 raspi-config nonint do_serial_hw 0
 raspi-config nonint do_serial_cons 1
 
+
 # Install packages
 echo -e "\e[1;32mInstalling system-wide packages (may take a while)...\e[0m"
+apt update -y
 apt install python3-pip
 apt install ffmpeg
 apt install xz-utils
