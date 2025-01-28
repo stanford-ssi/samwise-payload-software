@@ -1,5 +1,6 @@
 from helpers.serial_port_pi import SerialPort
 
+import time
 import binascii
 import logging
 
@@ -11,10 +12,12 @@ MAX_PACKET_SIZE = 4096
 
 # Constants for what is sent for acnowledgement
 ACK_BYTE = b"!"
-ACK_RETRIES = 3
+SYN_BYTE = b"$"
+SYN_COUNT = 3
+SYN_RETRIES = 3
 
-#Â Byte order for large numbers
-BYTE_ORDER = "big"
+# Byte order for large numbers
+BYTE_ORDER = "little"
 
 log = logging.getLogger(__name__)
 # Simple low level protocol that handles sending and packets
@@ -47,6 +50,23 @@ class SerialPacketHandler():
 
         return length, seq_num, crc32
     
+
+    def _wait_for_sync(self):
+        # Read bytes from the serial port until three $ have been sent
+        count = 0
+
+        while True:
+            data = self.serial_port.read(1)
+            if len(data) == 0:
+                return False
+            
+            if data[0] == ord(SYN_BYTE):
+                count += 1
+            else:
+                count = 0
+
+            if count == SYN_COUNT: return True
+    
     
     def _send_ack(self):
         # Send an acknowledgement
@@ -67,13 +87,21 @@ class SerialPacketHandler():
         header = self._calculate_header(packet, seq_num=seq_num)
 
         #Â Send header (try a few times)
-        for _ in range(ACK_RETRIES):
-            log.debug("Writing header...")
-            self.serial_port.write(header)
-
+        for _ in range(SYN_RETRIES):
+            log.debug("Sending sync...")
+            self.serial_port.write(SYN_BYTE * SYN_COUNT)
             if self._receive_ack(): break
+
+            time.sleep(0.1)
         else:
             # (strange syntax) - this runs if we do not receive the ack
+            log.debug("Header was not acknowledged!")
+            return False
+        
+        log.debug("Writing header...")
+        self.serial_port.write(header)
+
+        if not self._receive_ack():
             log.debug("Header was not acknowledged!")
             return False
 
@@ -88,9 +116,15 @@ class SerialPacketHandler():
    
     def read_packet(self) -> tuple[bytes, int]:
         # Method to read a packet
-        log.debug("Waiting for header...")
+        log.debug("Waiting for sync...")
+        if not self._wait_for_sync():
+            print("No sync arrived!")
+            return None
+        
+        self._send_ack()
 
         # Read and decode header
+        log.debug("Waiting for header...")
         header = self.serial_port.read(HEADER_LEN)
 
         if header is None or len(header) < HEADER_LEN:

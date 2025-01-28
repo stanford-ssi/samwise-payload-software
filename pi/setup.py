@@ -11,7 +11,7 @@ MULTIPLEXER_PIN1 = 4
 MULTIPLEXER_PIN2 = 17
 MULTIPLEXER_PIN3 = 18
 
-RADIO_2400_ENABLE = 10
+RADIO_2400_ENABLE = 27
 
 def initialize():
     gpio.setmode(gpio.BCM)
@@ -21,3 +21,6 @@ def initialize():
     gpio.setup(MULTIPLEXER_PIN1, gpio.OUT)
     gpio.setup(MULTIPLEXER_PIN2, gpio.OUT)
     gpio.setup(MULTIPLEXER_PIN3, gpio.OUT)
+
+    # Radio enable
+    gpio.setup(RADIO_2400_ENABLE, gpio.OUT)

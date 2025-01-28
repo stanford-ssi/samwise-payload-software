@@ -5,6 +5,7 @@ import json
 import binascii
 import shutil
 import subprocess
+import RPi.GPIO as gpio
 
 from typing import Any
 
@@ -20,6 +21,8 @@ VIDEOS_DIR = "/home/pi/videos"
 
 TX_2400_EXECUTABLE = "/home/pi/code/radio/build/Lora_tx"
 S_BAND_FREQ = 2400
+
+RADIO_2400_ENABLE = 27
 
 # Global objects that will be populated by main.py on startup
 packet_handler: SerialPacketHandler = None
@@ -141,16 +144,14 @@ def turn_on_2400():
     '''
     Turn on the 2400 radio - will be run automatically
     '''
-    # TODO
-    pass
+    gpio.output(RADIO_2400_ENABLE, 1)
 
 
 def turn_off_2400():
     '''
     Turn off the 2400 radio - must be run manually!
     '''
-    # TODO
-    pass
+    gpio.output(RADIO_2400_ENABLE, 0)
 
 
 def send_file_2400(filepath: str):

@@ -11,7 +11,7 @@ from helpers.log_utils import update_boot_count, get_boot_count, setup_logger, c
 # Static Config --------------
 
 PORT_NAME = "/dev/serial0"
-BAUDRATE = 9600
+BAUDRATE = 115200
 
 TIMEOUT = 10
 
