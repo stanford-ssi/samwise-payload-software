@@ -24,9 +24,14 @@ class SerialCommandHandlerPayload():
         if response is None: return None
         
         # Decode packet
-        packet = response[0]
-        command, args, kwargs = json.loads(packet)
-
+        try:
+            packet = response[0]
+            command, args, kwargs = json.loads(packet)
+        except:
+            log.error(f"Error decoding packet {packet}")
+            return None
+        
+        
         return command, args, kwargs
 
         
