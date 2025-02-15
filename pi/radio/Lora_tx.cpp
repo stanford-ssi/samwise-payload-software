@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
 	}
 
 	// Pins based on hardware configuration
-	SX128x_Linux Radio("/dev/spidev0.0", 0, {27, 26, 20, 16, -1, -1, 24, 25});
+	SX128x_Linux Radio("/dev/spidev0.0", 0, {26, 22, 5, 19, -1, -1, 23, 24});
 
 	// Assume we're running on a high-end Raspberry Pi,
 	// so we set the SPI clock speed to the maximum value supported by the chip
@@ -184,7 +184,7 @@ int main(int argc, char **argv) {
 
     // TX done interrupt handler
 	Radio.callbacks.txDone = []{
-		//puts("Done!");
+		puts("Done!");
 	};
 
 	auto IrqMask = SX128x::IRQ_TX_DONE | SX128x::IRQ_RX_TX_TIMEOUT;
