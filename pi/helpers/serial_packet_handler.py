@@ -15,6 +15,7 @@ ACK_BYTE = b"!"
 SYN_BYTE = b"$"
 SYN_COUNT = 3
 SYN_RETRIES = 3
+PRIM_BYTE = b"@"
 
 # Byte order for large numbers
 BYTE_ORDER = "little"
@@ -86,7 +87,7 @@ class SerialPacketHandler():
         
         header = self._calculate_header(packet, seq_num=seq_num)
 
-        #Â Send header (try a few times)
+        #Send header (try a few times)
         for _ in range(SYN_RETRIES):
             log.debug("Sending sync...")
             self.serial_port.write(SYN_BYTE * SYN_COUNT)
@@ -97,6 +98,8 @@ class SerialPacketHandler():
             # (strange syntax) - this runs if we do not receive the ack
             log.debug("Header was not acknowledged!")
             return False
+
+        self.serial_port.write(PRIM_BYTE)
         
         log.debug("Writing header...")
         self.serial_port.write(header)
@@ -122,6 +125,17 @@ class SerialPacketHandler():
             return None
         
         self._send_ack()
+
+        # Wait for the start byte to come in
+        count = 0
+        while(self.serial_port.read(1) != PRIM_BYTE):
+            log.debug("Waiting for the start byte, flushing sync bytes")
+
+        if (count == 10):
+            log.debug("Waiting for the start byte timeout!")
+            return None
+
+        count = count + 1
 
         # Read and decode header
         log.debug("Waiting for header...")
