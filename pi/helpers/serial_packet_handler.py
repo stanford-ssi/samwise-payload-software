@@ -131,11 +131,11 @@ class SerialPacketHandler():
         while(self.serial_port.read(1) != PRIM_BYTE):
             log.debug("Waiting for the start byte, flushing sync bytes")
 
-        if (count == 10):
-            log.debug("Waiting for the start byte timeout!")
-            return None
+            if (count == 10):
+                log.debug("Waiting for the start byte timeout!")
+                return None
 
-        count = count + 1
+            count = count + 1
 
         # Read and decode header
         log.debug("Waiting for header...")
