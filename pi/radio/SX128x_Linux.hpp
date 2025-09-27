@@ -33,7 +33,7 @@ class SX128x_Linux : public SX128x {
 public:
 	struct PinConfig {
 		int16_t busy = -1, nrst = -1, nss = -1, dio1 = -1, dio2 = -1, dio3 = -1;
-		int16_t tx_en = -1, rx_en = -1;
+		int16_t tx_en = -1, rx_en = -1, tcxo = -1;
 	};
 
 	SX128x_Linux(const std::string& spi_dev_path, uint16_t gpio_dev_num, PinConfig pin_config);
